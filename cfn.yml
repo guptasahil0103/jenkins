@@ -1,0 +1,99 @@
+
+Parameters: 
+  
+  SecurityGroup:
+    Description: Security Group of the EC2 Instance 
+    Type: String
+  
+  InstanceType:
+    Description: WebServer EC2 instance type (has default, AllowedValues)
+    Type: String
+    Default: t2.small
+    AllowedValues:
+      - t1.micro
+      - t2.nano
+      - t2.micro
+      - t2.small
+    ConstraintDescription: must be a valid EC2 instance type.
+
+  KeyPair:
+    Description: Choose a key-pair for your instance
+    Type: AWS::EC2::KeyPair::KeyName
+    ConstraintDescription: must be an existing EC2 KeyPair.
+  
+  SecurityGroupInboundRule:
+    Description: The IP address range to communicate to the EC2 instances
+    Type: String
+    MinLength: '9'
+    MaxLength: '18'
+    Default: 0.0.0.0/0
+    AllowedPattern: (\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})
+    ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
+  
+  SecurityGroupPort:
+    Description: Simple Description of a Number Parameter, with MinValue and MaxValue
+    Type: Number
+    MinValue: 0
+    MaxValue: 65535
+  
+  VPC:
+    Description: Select a VPC in which intance to be deployed 
+    Type: "List<AWS::EC2::VPC::Id>"
+  
+  Subnet:
+    Description: Select the Subnet 
+    Type: "List<AWS::EC2::Subnet::Id>" 
+  
+  
+
+Resources:
+  
+    MyEC2Instance:
+      Type: AWS::EC2::Instance
+      Properties:
+        #we reference the InstanceType parameter
+        InstanceType: !Ref InstanceType
+        KeyName: !Ref KeyPair
+        ImageId: ami-0742b4e673072066f
+        # here we reference an internal CloudFormation resource
+        SubnetId: !Ref Subnet
+    
+    MySecurityGroup:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        GroupDescription: !Ref SecurityGroup
+        SecurityGroupIngress:
+          - CidrIp: !Ref   SecurityGroupInboundRule
+            FromPort: !Ref SecurityGroupPort
+            ToPort: !Ref SecurityGroupPort
+            IpProtocol: tcp
+        VpcId: !Ref VPC    
+
+
+
+
+
+
+
+#Resources:
+ # MyS3Bucket:
+  #  Type: AWS::S3::Bucket
+   # Properties: 
+    #  BucketName: "demo-s3-cfn"
+#Parameters:
+#  SecurityGroupDescription:
+#  Description: Sample Parameter 
+#  Type: String
+
+#SecurityGroupPort:
+#  Description: Simple Description
+ # Type: 
+
+#Instance4:
+ #   Condition: Launch4
+  #  Type: AWS::EC2::Instance   
+   # Properties:
+    #  ImageId: !Ref ImageId
+     ## InstanceType: !Ref InstanceType
+      #KeyName : !Ref KeyName 
+      #SecurityGroupIds:
